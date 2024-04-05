@@ -1,0 +1,18 @@
+Message
+- id
+- from_user
+- to_user
+- message_content
+- timestamp
+- read_confim
+
+User
+- id
+- username
+- avatar_path
+
+Chat
+- id
+- user1
+- user2
+- has_new_messages
