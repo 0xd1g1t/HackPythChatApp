@@ -19,7 +19,7 @@ def login_page():
 
 
 @app.route('/chat')
-def tickets_page():
+def chat_page():
     items = [{ "id": 1, "prio": 2, "user": "Mark", "title":"Backend broken"},
              { "id": 2, "prio": 2, "user": "Peter", "title":"GUI not working"},
              { "id": 3, "prio": 1, "user": "Mark", "title":"Nothing works"}]
