@@ -1,0 +1,28 @@
+use chatdb;
+
+# create table mit namen chatusers
+create table chatusers (id INT NOT NULL auto_increment, primary key (id));
+alter table chatusers add column username VARCHAR(128) not null;
+alter table chatusers add column password varchar(128) not null;
+alter table chatusers add column status VARCHAR(128) not null;
+alter table chatusers add column avatar VARCHAR(128) not null;
+
+# create table mit name messages
+create table messages (id INT NOT NULL auto_increment, primary key (id));
+alter table messages add column from_user INT not null;
+alter table messages add column to_user INT not null;
+alter table messages add column message VARCHAR(1024) not null;
+
+#insert into bugitems table
+INSERT INTO messages (from_user, to_user, message) VALUES (1, 2, 'Hallo');
+INSERT INTO messages (from_user, to_user, message) VALUES (2, 1, 'Hallo');
+INSERT INTO messages (from_user, to_user, message) VALUES (3, 1, 'Hallo');
+INSERT INTO messages (from_user, to_user, message) VALUES (1, 3, 'Hallo');
+INSERT INTO messages (from_user, to_user, message) VALUES (4, 1, 'Hallo');
+
+#insert into ticketusers table
+INSERT INTO chatusers (id, username, password, status, avatar) VALUES (1, 'Natalie', 'pass', 'Lorem ipsum dolor sit.', 'img/default.jpeg');
+INSERT INTO chatusers (id, username, password, status, avatar) VALUES (2, 'Walter', 'pass', 'Lorem ipsum dolor sit.', 'img/default.jpeg');
+INSERT INTO chatusers (id, username, password, status, avatar) VALUES (3, 'Rick', 'pass', 'Lorem ipsum dolor sit.', 'img/default.jpeg');
+INSERT INTO chatusers (id, username, password, status, avatar) VALUES (4, 'Jerry', 'pass', 'Lorem ipsum dolor sit.', 'img/default.jpeg');
+INSERT INTO chatusers (id, username, password, status, avatar) VALUES (5, 'Beth', 'pass', 'Lorem ipsum dolor sit.', 'img/default.jpeg');

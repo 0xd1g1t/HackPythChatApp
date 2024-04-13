@@ -1,11 +1,7 @@
 from chat import app, db
-from flask import render_template, request
+from flask import render_template, request, flash, redirect, url_for
 from sqlalchemy import text
 
-
-@app.route('/')
-def home_page():
-    return render_template('home.jinja')
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -18,20 +14,33 @@ def login_page():
     return render_template("login.jinja")
 
 
-@app.route('/chat')
+@app.route('/register', methods=['GET', 'POST'])
+def register_page():
+    return render_template("register.jinja")
+
+
+@app.route('/')
 def chat_page():
-    items = [{ "id": 1, "prio": 2, "user": "Mark", "title":"Backend broken"},
-             { "id": 2, "prio": 2, "user": "Peter", "title":"GUI not working"},
-             { "id": 3, "prio": 1, "user": "Mark", "title":"Nothing works"}]
+    chat_id = request.args.get('chat', default=1, type=int)
 
-    users = [{ "username": "Hans Peter", "avatar_path": "default.jpeg"}]
+    messages = [{"from_user": 1, "to": "Peter", "message": "Hallo Peter"},
+                {"from_user": 2, "to": "Hans", "message": "Hi, was geht?"},
+                {"from_user": 2, "to": "Hans", "message": "Hi, was geht?"},
+                {"from_user": 1, "to": "Peter", "message": "Nix"}]
 
-    messages = [{ "from": 1, "message": "Hallo" }]
+    chats = [
+        { "username": "Hans", "status": "Lorem ipsum dolor sit.", "avatar": "img/default.jpeg", "active": True},
+        { "username": "Frank", "status": "Lorem ipsum dolor sit.", "avatar": "img/default.jpeg"},
+        { "username": "Martin", "status": "Lorem ipsum dolor sit.", "avatar": "img/default.jpeg"},
+        { "username": "Klaus", "status": "Lorem ipsum dolor sit.", "avatar": "img/default.jpeg"},
+    ]
 
-    '''
-    query_stmt = f"select * from bugitems"
-    result = db.session.execute(text(query_stmt))
-    itemsquery = result.fetchall()
-    '''
+    current_user = 1
+    result = db.session.execute(text(f"SELECT * FROM chatusers WHERE id != {current_user};"))
+    chats = result.fetchall()
 
-    return render_template("chat.jinja")#, items=itemsquery)
+    result = db.session.execute(text(f"SELECT * FROM messages WHERE (to_user = {chat_id} and from_user = {current_user}) OR (from_user = {chat_id} and to_user = {current_user});"))
+    messages = result.fetchall()
+
+
+    return render_template("chat.jinja", messages=messages, chats=chats, current_user=current_user, chat_id=chat_id)

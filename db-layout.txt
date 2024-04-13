@@ -16,3 +16,17 @@ Chat
 - user1
 - user2
 - has_new_messages
+
+
+
+## Aktuell ##
+message:
+- from_user
+- to_user
+- message
+
+chatser:
+- username
+- password
+- status
+- avatar

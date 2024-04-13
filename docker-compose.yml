@@ -8,15 +8,13 @@ services:
     environment:
       FLASK_DEBUG: "true"
 
-#  db:
-#    image: mariadb
-#    environment:
-#      MYSQL_ROOT_PASSWORD: password
-#      MYSQL_DATABASE: chatdb
-#      MYSQL_USER: chatdbuser
-#      MYSQL_PASSWORD: Heute0000
-#    volumes:
-#      - ./db:/var/lib/mysql
-#      - ./db-init.db:/docker-entrypoint-initdb.d/1.sql
-#    expose:
-#      - ""
+  db:
+    image: mariadb
+    environment:
+      MYSQL_ROOT_PASSWORD: supersicheresrootpassword
+      MYSQL_DATABASE: chatdb
+      MYSQL_USER: chatdbuser
+      MYSQL_PASSWORD: Heute0000
+    volumes:
+      - ./db:/var/lib/mysql
+      - ./db-init.db:/docker-entrypoint-initdb.d/init.sql

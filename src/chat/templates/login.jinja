@@ -1,9 +1,22 @@
 {% extends "base.jinja" %}
 
-{% block title %}
-Login
-{% endblock %}
-
 {% block content %}
-Hallo
+<main class="form-signin w-100 m-auto mt-5">
+    <form>
+        <h1 class="h3 mb-3 fw-normal">Bitte Anmelden</h1>
+
+        <div class="form-floating">
+            <input type="text" class="form-control" id="username" placeholder="Benutzername">
+            <label for="floatingInput">Benutzername</label>
+        </div>
+        <div class="form-floating mb-3">
+            <input type="password" class="form-control" id="password" placeholder="Password">
+            <label for="floatingPassword">Password</label>
+        </div>
+
+        <button class="btn btn-primary w-100 py-2" type="submit">Login</button>
+
+        <p class="mt-3 mb-0">Noch nicht registriert? <a href="{{ url_for('register_page') }}" class="text-decoration-none">Registrieren</a></p>
+    </form>
+</main>
 {% endblock %}
