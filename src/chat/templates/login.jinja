@@ -2,15 +2,15 @@
 
 {% block content %}
 <main class="form-signin w-100 m-auto mt-5">
-    <form>
-        <h1 class="h3 mb-3 fw-normal">Bitte Anmelden</h1>
+    <form method="POST" action="{{ url_for('login_page') }}">
+        <h1 class="h3 mb-3 fw-normal">Login</h1>
 
         <div class="form-floating">
-            <input type="text" class="form-control" id="username" placeholder="Benutzername">
+            <input type="text" class="form-control" id="username" name="username" placeholder="Benutzername">
             <label for="floatingInput">Benutzername</label>
         </div>
         <div class="form-floating mb-3">
-            <input type="password" class="form-control" id="password" placeholder="Password">
+            <input type="password" class="form-control" id="password" name="password" placeholder="Password">
             <label for="floatingPassword">Password</label>
         </div>
 

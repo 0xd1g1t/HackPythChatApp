@@ -55,9 +55,9 @@
             <div class="col-md-6 col-lg-7 col-xl-8 vh-100">
                 <ul class="p-4 list-unstyled overflow-y-auto h-50" id="scroll-container">
                 {% for message in messages %}
-                    {% if current_user == message.from_user %}
+                    {% if current_user.id == message.from_user %}
                     <li class="d-flex justify-content-end mb-4">
-                        <div class="card w-80 {% if current_user == message.from_user %}text-bg-primary{% endif %}">
+                        <div class="card w-80 {% if current_user.id == message.from_user %}text-bg-primary{% endif %}">
                     {% else %}
                     <li class="d-flex mb-4">
                         <div class="card w-80 text-bg-secondary">
@@ -79,10 +79,12 @@
                 <!-- automaticaly scroll to the bottom -->
                 <script> var objDiv = document.getElementById("scroll-container"); objDiv.scrollTop = objDiv.scrollHeight; </script>
 
-                <div class="form-outline mb-3" data-mdb-input-init>
-                    <textarea class="form-control" id="message-input" rows="4" placeholder="Message"></textarea>
-                </div>
-                <button type="button" class="btn btn-info btn-rounded float-end">Send</button>
+                <form method="POST" action="{{ url_for('chat_page', chat=chat_id) }}">
+                    <div class="form-outline mb-3" data-mdb-input-init>
+                        <textarea class="form-control" id="message-input" name="message-input" rows="4" placeholder="Message"></textarea>
+                    </div>
+                    <input type="submit" class="btn btn-info btn-rounded float-end" value="Send" name="send-message">
+                </form>
 
             </div>
 

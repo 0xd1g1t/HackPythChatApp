@@ -1,15 +1,37 @@
 from chat import app, db
-from flask import render_template, request, flash, redirect, url_for
+from flask import render_template, request, flash, redirect, url_for, session
 from sqlalchemy import text
-
 
 
 @app.route('/login', methods=['GET', 'POST'])
 def login_page():
     if request.method == 'POST':
-        username = request.form.get('Username')
-        password = request.form.get('Password')
-        print(f"[!] {username} tried to login with password '{password}'")
+        username = request.form.get('username')
+        password = request.form.get('password')
+
+        if (username is None or
+                isinstance(username, str) is False or
+                len(username) < 3):
+            flash(f"Username is not valid", category='warning')
+            return render_template('login.jinja')
+
+        if (password is None or
+                isinstance(password, str) is False or
+                len(password) < 3):
+            flash(f"Password is not valid", category='warning')
+            return render_template('login.jinja')
+        
+        query_stmt = f"select id from chatusers where username = '{username}' and password = '{password}'"
+        result = db.session.execute(text(query_stmt))
+        user = result.fetchone()
+
+        if not user:
+            flash(f"Benutzername oder Passwort falsch!", category='warning')
+            return render_template ('login.jinja')
+        
+        session['userid'] = user.id
+
+        return redirect(url_for("chat_page"))
 
     return render_template("login.jinja")
 
@@ -19,28 +41,35 @@ def register_page():
     return render_template("register.jinja")
 
 
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def chat_page():
-    chat_id = request.args.get('chat', default=1, type=int)
+    # check if current user is logged in
+    if not session['userid']:
+        flash("Bitte einloggen", category='warning')
+        return redirect(url_for("login_page"))
 
-    messages = [{"from_user": 1, "to": "Peter", "message": "Hallo Peter"},
-                {"from_user": 2, "to": "Hans", "message": "Hi, was geht?"},
-                {"from_user": 2, "to": "Hans", "message": "Hi, was geht?"},
-                {"from_user": 1, "to": "Peter", "message": "Nix"}]
+    chat_id = request.args.get('chat')
+    if chat_id == None:
+        return redirect(url_for('chat_page', chat=1 if session['userid'] != 1 else 2))
 
-    chats = [
-        { "username": "Hans", "status": "Lorem ipsum dolor sit.", "avatar": "img/default.jpeg", "active": True},
-        { "username": "Frank", "status": "Lorem ipsum dolor sit.", "avatar": "img/default.jpeg"},
-        { "username": "Martin", "status": "Lorem ipsum dolor sit.", "avatar": "img/default.jpeg"},
-        { "username": "Klaus", "status": "Lorem ipsum dolor sit.", "avatar": "img/default.jpeg"},
-    ]
+    if request.method == "POST":
+        message = request.form.get('message-input')
+        if (message is None or 
+            isinstance(message, str) is False or
+            len(message) == 0):
+            flash(f"Message was empty! {message}", category='info')
+            return redirect(url_for('chat_page', chat=chat_id))
+        query_send_message = f"INSERT INTO messages (from_user, to_user, message) VALUES ({session['userid']}, '{chat_id}', '{message}')"
+        db.session.execute(text(query_send_message))
+        db.session.commit()
 
-    current_user = 1
-    result = db.session.execute(text(f"SELECT * FROM chatusers WHERE id != {current_user};"))
+    result = db.session.execute(text(f"SELECT * FROM chatusers WHERE id != {session['userid']};"))
     chats = result.fetchall()
 
-    result = db.session.execute(text(f"SELECT * FROM messages WHERE (to_user = {chat_id} and from_user = {current_user}) OR (from_user = {chat_id} and to_user = {current_user});"))
+    result = db.session.execute(text(f"SELECT * FROM messages WHERE (to_user = {chat_id} and from_user = {session['userid']}) OR (from_user = {chat_id} and to_user = {session['userid']});"))
     messages = result.fetchall()
 
+    result = db.session.execute(text(f"SELECT * FROM chatusers WHERE id = {session['userid']}"))
+    current_user = result.fetchone()
 
     return render_template("chat.jinja", messages=messages, chats=chats, current_user=current_user, chat_id=chat_id)
