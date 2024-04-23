@@ -1,7 +1,8 @@
 from chat import app, db
-from flask import render_template, request, flash, redirect, url_for, session
+from flask import render_template, request, flash, redirect, url_for, session, send_file
+from werkzeug.utils import secure_filename
 from sqlalchemy import text
-
+import os
 
 @app.route('/login', methods=['GET', 'POST'])
 def login_page():
@@ -38,13 +39,49 @@ def login_page():
 
 @app.route('/register', methods=['GET', 'POST'])
 def register_page():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password1 = request.form.get('password1')
+        password2 = request.form.get('password2')
+
+        if (username is None or
+                isinstance(username, str) is False or
+                len(username) < 3):
+            flash(f"Username is not valid", category="danger")
+            app.logger.info(f"Failed registration: Username is not valid ({username})")
+            return render_template("register.jinja")
+
+        if (password1 is None or
+                isinstance(password1, str) is False or
+                len(password1) < 3 or
+                password1 != password2):
+            flash(f"Password is not valid", category="danger")
+            return render_template("register.jinja")
+
+        query_stmt = f"SELECT * FROM chatusers WHERE username = '{username}'"
+        result = db.session.execute(text(query_stmt))
+        item = result.fetchone()
+
+        if item is not None:
+            flash("Username exists, try again", category="danger")
+            return render_template("register.jinja")
+        
+        default_status = "Lorem ipsum dolor sit."
+        default_avatar = "img/default.jpeg"
+        query_insert = f"insert into chatusers (username, password, status, avatar) values ('{username}', '{password1}', '{default_status}', '{default_avatar}')"
+
+        db.session.execute(text(query_insert))
+        db.session.commit()
+        flash("You are registered", category="success")
+        return redirect(url_for('chat_page'))
     return render_template("register.jinja")
+
 
 
 @app.route('/', methods=['GET', 'POST'])
 def chat_page():
     # check if current user is logged in
-    if not session['userid']:
+    if not session.get('userid'):
         flash("Bitte einloggen", category='warning')
         return redirect(url_for("login_page"))
 
@@ -73,3 +110,72 @@ def chat_page():
     current_user = result.fetchone()
 
     return render_template("chat.jinja", messages=messages, chats=chats, current_user=current_user, chat_id=chat_id)
+
+
+@app.route("/profile", methods=["GET", "POST"])
+def profile_page():
+    if request.method == "POST":
+        username = request.form.get('username')
+        status = request.form.get('status')
+
+        if (username is None or
+                isinstance(username, str) is False or
+                len(username) < 3):
+            flash(f"Username is not valid!", category='warning')
+            return render_template('login.jinja')
+
+        if (status is None or
+                isinstance(status, str) is False or
+                len(status) < 3):
+            flash(f"Status is not valid!", category='warning')
+            return render_template('login.jinja')
+
+        result = db.session.execute(text(f"SELECT * FROM chatusers WHERE id = {session['userid']}"))
+        current_user = result.fetchone()
+
+        if 'file' in request.files:
+            app.logger.info(f"updating profile picture to {username}")
+            file = request.files['file']
+            if file.filename != '':
+                file_path = os.path.join(app.config["UPLOAD_PATH"], str(current_user.id))
+                file.save(file_path)
+
+                query_update = f"UPDATE chatusers SET avatar = '/avatars/{current_user.id}' WHERE id = '{current_user.id}'"
+                db.session.execute(text(query_update))
+                db.session.commit()
+                flash("Avatar succesfully updated!", category="success")
+
+        if username != current_user.username:
+            # update username in database
+            app.logger.info(f"updating username to {username}")
+            query_update = f"UPDATE chatusers SET username = '{username}' WHERE id = '{current_user.id}'"
+            db.session.execute(text(query_update))
+            db.session.commit()
+            flash("Username succesfully updated!", category="success")
+
+        if status != current_user.status:
+            # update status in database
+            app.logger.info(f"updating status to {status}")
+            query_update = f"UPDATE chatusers SET status = '{status}' WHERE id = '{current_user.id}'"
+            db.session.execute(text(query_update))
+            db.session.commit()
+            flash("Status succesfully updated!", category="success")
+
+    result = db.session.execute(text(f"SELECT * FROM chatusers WHERE id = {session['userid']}"))
+    current_user = result.fetchone()
+
+    return render_template("profile.jinja", current_user=current_user)
+    
+
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect(url_for("login_page"))
+
+
+@app.route("/avatars/<filename>")
+def avatars(filename):
+    path = os.path.join(app.config["UPLOAD_PATH"], filename)
+    if not os.path.isfile(path):
+        path = os.path.join(app.static_folder, "img/default.jpeg")
+    return send_file(path)

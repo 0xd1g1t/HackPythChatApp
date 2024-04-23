@@ -1,7 +1,7 @@
 {% extends "base_with_navbar.jinja" %}
 
 {% block title %}
-<h1>Chat</h1>
+Chat
 {% endblock %}
 
 {% block content %}
@@ -23,7 +23,7 @@
                             <li class="p-2 {% if chat != chats[-1] %}border-bottom{% endif %} {% if chat.id == chat_id %}bg-body-secondary{% endif %}">
                                 <a href="{{ url_for('chat_page', chat=chat.id) }}" class="d-flex justify-content-between text-decoration-none">
                                     <div class="d-flex flex-row">
-                                        <img src="{{ url_for('static', filename=chat.avatar) }}"
+                                        <img src="{{ url_for('avatars', filename=chat.id) }}"
                                             alt="avatar"
                                             class="rounded-circle d-flex align-self-center me-3 shadow-1-strong"
                                             width="60">

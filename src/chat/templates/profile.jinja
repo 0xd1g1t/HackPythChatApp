@@ -1,0 +1,72 @@
+{% include "base_with_navbar.jinja" %}
+
+{% block content %}
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
+
+<div class="container p-0">
+    <h1 class="h3 mb-3">Settings</h1>
+    <div class="card">
+        <div class="card-header">
+            <h5 class="card-title mb-0">Public info</h5>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="/profile"  enctype="multipart/form-data">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="text-center px-4">
+                            <img alt="Andrew Jones" src="{{ url_for('avatars', filename=current_user.id) }}"
+                                class="rounded-circle img-responsive mt-2" width="128" height="128">
+                            <div class="mt-3">
+                                <input type="file" class="form-control" name="file"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            <label for="inputUsername">Username</label>
+                            <input type="text" class="form-control mt-1" id="username"
+                                value="{{ current_user.username }}" name="username">
+                        </div>
+                        <div class="form-group mt-3">
+                            <label for="inputUsername">Status</label>
+                            <input type="text" class="form-control mt-1" id="status" name="status"
+                                value="{{ current_user.status }}"></textarea>
+                        </div>
+                    <button type="submit" class="btn btn-primary mt-4 pull-right">Save changes</button>
+                    </div>
+
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+    <!--<div class="card mt-3">
+        <div class="card-header">
+            <h5 class="card-title mb-0">Password</h5>
+        </div>
+        <div class="card-body">
+            <form>
+                <div class="form-group">
+                    <label for="inputPasswordCurrent">Current password</label>
+                    <input type="password" class="form-control" id="inputPasswordCurrent">
+                </div>
+                <div class="form-group">
+                    <label for="inputPasswordNew">New password</label>
+                    <input type="password" class="form-control" id="inputPasswordNew">
+                </div>
+                <div class="form-group">
+                    <label for="inputPasswordNew2">Verify password</label>
+                    <input type="password" class="form-control" id="inputPasswordNew2">
+                </div>
+                <button type="submit" class="btn btn-primary">Save changes</button>
+            </form>
+
+        </div>
+    </div>-->
+</div>
+</div>
+</div>
+
+</div>
+{% endblock %}
