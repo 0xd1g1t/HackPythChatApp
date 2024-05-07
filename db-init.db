@@ -18,9 +18,16 @@ INSERT INTO messages (from_user, to_user, message) VALUES (2, 1, 'Hallo');
 INSERT INTO messages (from_user, to_user, message) VALUES (3, 1, 'Hallo');
 INSERT INTO messages (from_user, to_user, message) VALUES (1, 3, 'Hallo');
 INSERT INTO messages (from_user, to_user, message) VALUES (4, 1, 'Hallo');
+INSERT INTO messages (from_user, to_user, message) VALUES (1, 4, 'Hallo');
+INSERT INTO messages (from_user, to_user, message) VALUES (3, 2, 'Hallo');
+INSERT INTO messages (from_user, to_user, message) VALUES (2, 3, 'Hallo');
+INSERT INTO messages (from_user, to_user, message) VALUES (3, 4, 'Hallo');
+INSERT INTO messages (from_user, to_user, message) VALUES (4, 3, 'Hallo');
+INSERT INTO messages (from_user, to_user, message) VALUES (4, 2, 'Hallo');
+INSERT INTO messages (from_user, to_user, message) VALUES (2, 4, 'Hallo');
 
 #insert into ticketusers table
-INSERT INTO chatusers (id, username, password, status) VALUES (2, 'Morty', 'pass', 'Lorem ipsum dolor sit.');
+INSERT INTO chatusers (id, username, password, status) VALUES (1, 'Morty', 'pass', 'Lorem ipsum dolor sit.');
+INSERT INTO chatusers (id, username, password, status) VALUES (2, 'Jerry', '1234qwer', 'Lorem ipsum dolor sit.');
 INSERT INTO chatusers (id, username, password, status) VALUES (3, 'Rick', 'pass', 'Lorem ipsum dolor sit.');
-INSERT INTO chatusers (id, username, password, status) VALUES (4, 'Jerry', 'pass', 'Lorem ipsum dolor sit.');
-INSERT INTO chatusers (id, username, password, status) VALUES (5, 'Beth', 'pass', 'Lorem ipsum dolor sit.');
+INSERT INTO chatusers (id, username, password, status) VALUES (4, 'Beth', 'pass', 'Lorem ipsum dolor sit.');

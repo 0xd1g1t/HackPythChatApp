@@ -1,5 +1,9 @@
 {% extends "base.jinja" %}
 
+{% block title %}
+Login Page
+{% endblock %}
+
 {% block content %}
 <main class="form-signin w-100 m-auto mt-5">
     <form method="POST" action="{{ url_for('login_page') }}">
