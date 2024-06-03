@@ -68,7 +68,7 @@ def register_page():
         
         default_status = "Lorem ipsum dolor sit."
         default_avatar = "img/default.jpeg"
-        query_insert = f"insert into chatusers (username, password, status, avatar) values ('{username}', '{password1}', '{default_status}', '{default_avatar}')"
+        query_insert = f"insert into chatusers (username, password, status) values ('{username}', '{password1}', '{default_status}')"
 
         db.session.execute(text(query_insert))
         db.session.commit()
