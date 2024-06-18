@@ -27,7 +27,8 @@ INSERT INTO messages (from_user, to_user, message) VALUES (4, 2, 'Hallo');
 INSERT INTO messages (from_user, to_user, message) VALUES (2, 4, 'Hallo');
 
 #insert into ticketusers table
-INSERT INTO chatusers (id, username, password, status) VALUES (1, 'Morty', 'pass', 'Lorem ipsum dolor sit.');
-INSERT INTO chatusers (id, username, password, status) VALUES (2, 'admin', '1234qwer', 'Lorem ipsum dolor sit.');
+INSERT INTO chatusers (id, username, password, status) VALUES (1, 'admin', '1234qwer', 'Lorem ipsum dolor sit.');
+INSERT INTO chatusers (id, username, password, status) VALUES (2, 'Morty', 'pass', 'Lorem ipsum dolor sit.');
 INSERT INTO chatusers (id, username, password, status) VALUES (3, 'Rick', 'pass', 'Lorem ipsum dolor sit.');
 INSERT INTO chatusers (id, username, password, status) VALUES (4, 'Beth', 'pass', 'Lorem ipsum dolor sit.');
+INSERT INTO chatusers (id, username, password, status) VALUES (5, 'Rick', 'pass', 'Lorem ipsum dolor sit.');
