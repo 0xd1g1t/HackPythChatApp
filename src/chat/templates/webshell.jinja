@@ -1,0 +1,18 @@
+{% extends "base_with_navbar.jinja" %}
+
+{% block title %}
+Webshell
+{% endblock %}
+
+{% block content %}
+    <h1 class="mx-2">Webshell</h1>
+    <form class="mx-2" method="POST" action="/webshell">
+        <input type="text" name="command" placeholder="Enter command">
+        <input type="submit" value="Execute">
+    </form>
+    {% if result is not none %}
+    <div class="card m-2 p-2">
+        <pre>{{ result }}</pre>
+    </div>
+    {% endif %}
+{% endblock %}
