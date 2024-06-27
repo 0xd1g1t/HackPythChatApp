@@ -1,6 +1,6 @@
 Flask==2.3.3
 Flask_SQLAlchemy==2.5.1
 SQLAlchemy==1.4.44
-PyMySQL==1.1.0
+PyMySQL==1.1.1
 pillow==10.3.0
 Flask-Limiter==3.7.0
