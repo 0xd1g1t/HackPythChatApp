@@ -1,9 +1,17 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+
+UPLOAD_PATH = '/srv/uploads'
 
 app = Flask(__name__)
 
-UPLOAD_PATH = '/srv/uploads'
+limiter = Limiter(
+    get_remote_address,
+    app=app,
+    default_limits=["10 per minute"]
+)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://chatdbuser:Heute0000@db/chatdb'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
