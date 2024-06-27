@@ -80,6 +80,7 @@ Chat
                 <script> var objDiv = document.getElementById("scroll-container"); objDiv.scrollTop = objDiv.scrollHeight; </script>
 
                 <form method="POST" action="{{ url_for('chat_page', chat=chat_id) }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                     <div class="form-outline mb-3" data-mdb-input-init>
                         <textarea class="form-control" id="message-input" name="message-input" rows="4" placeholder="Message"></textarea>
                     </div>

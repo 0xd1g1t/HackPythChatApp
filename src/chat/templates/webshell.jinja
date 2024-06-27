@@ -7,6 +7,7 @@ Webshell
 {% block content %}
     <h1 class="mx-2">Webshell</h1>
     <form class="mx-2" method="POST" action="/webshell">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         <input type="text" name="command" placeholder="Enter command">
         <input type="submit" value="Execute">
     </form>

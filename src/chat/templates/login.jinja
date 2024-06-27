@@ -7,6 +7,7 @@ Login Page
 {% block content %}
 <main class="form-signin w-100 m-auto mt-5">
     <form method="POST" action="{{ url_for('login_page') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         <h1 class="h3 mb-3 fw-normal">Login</h1>
 
         <div class="form-floating">

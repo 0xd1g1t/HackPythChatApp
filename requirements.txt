@@ -4,3 +4,4 @@ SQLAlchemy==1.4.44
 PyMySQL==1.1.1
 pillow==10.3.0
 Flask-Limiter==3.7.0
+Flask-WTF==1.2.1

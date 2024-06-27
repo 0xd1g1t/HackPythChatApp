@@ -2,6 +2,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+from flask_wtf.csrf import CSRFProtect
 
 UPLOAD_PATH = '/srv/uploads'
 
@@ -12,6 +13,9 @@ limiter = Limiter(
     app=app,
     default_limits=["100 per minute"]
 )
+
+csrf = CSRFProtect(app)
+csrf.init_app(app)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://chatdbuser:Heute0000@db/chatdb'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
