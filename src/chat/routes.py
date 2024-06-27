@@ -1,6 +1,6 @@
 from chat import app, db
 from chat.models import Chatuser, Message
-from flask import render_template, request, flash, redirect, url_for, session, send_file
+from flask import render_template, request, flash, redirect, url_for, session, send_file, escape
 from werkzeug.utils import secure_filename
 from sqlalchemy import text
 import os
@@ -9,7 +9,7 @@ import subprocess
 @app.route('/login', methods=['GET', 'POST'])
 def login_page():
     if request.method == 'POST':
-        username = request.form.get('username')
+        username = str(escape(request.form.get('username')))
         password = request.form.get('password')
 
         if (username is None or
@@ -40,7 +40,7 @@ def login_page():
 @app.route('/register', methods=['GET', 'POST'])
 def register_page():
     if request.method == 'POST':
-        username = request.form.get('username')
+        username = str(escape(request.form.get('username')))
         password1 = request.form.get('password1')
         password2 = request.form.get('password2')
 
@@ -96,7 +96,7 @@ def chat_page():
             flash(f"Message was empty! {message}", category='info')
             return redirect(url_for('chat_page', chat=chat_id))
 
-        new_message = Message(from_user=session['userid'], to_user=chat_id, message=message)
+        new_message = Message(from_user=session['userid'], to_user=chat_id, message=str(escape(message)))
         db.session.add(new_message)
         db.session.commit()
 
@@ -105,6 +105,7 @@ def chat_page():
         ((Message.to_user == chat_id) & (Message.from_user == session['userid'])) | 
         ((Message.from_user == chat_id) & (Message.to_user == session['userid']))
     ).all()
+
     current_user = Chatuser.query.get(session['userid'])
 
     return render_template("chat.jinja", messages=messages, chats=chats, current_user=current_user, chat_id=chat_id)
@@ -113,7 +114,7 @@ def chat_page():
 @app.route("/profile", methods=["GET", "POST"])
 def profile_page():
     if request.method == "POST":
-        username = request.form.get('username')
+        username = str(escape(request.form.get('username')))
         status = request.form.get('status')
 
         if not username or len(username) < 3:
@@ -141,7 +142,7 @@ def profile_page():
             flash("Username successfully updated!", category="success")
 
         if status != current_user.status:
-            current_user.status = status
+            current_user.status = str(escape(status))
             db.session.commit()
             flash("Status successfully updated!", category="success")
 
