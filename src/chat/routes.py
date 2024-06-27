@@ -1,4 +1,5 @@
 from chat import app, db
+from chat.models import Chatuser, Message
 from flask import render_template, request, flash, redirect, url_for, session, send_file
 from werkzeug.utils import secure_filename
 from sqlalchemy import text
@@ -23,9 +24,7 @@ def login_page():
             flash(f"Password is not valid", category='warning')
             return render_template('login.jinja')
         
-        query_stmt = f"select id from chatusers where username = '{username}' and password = '{password}'"
-        result = db.session.execute(text(query_stmt))
-        user = result.fetchone()
+        user = Chatuser.query.filter_by(username=username, password=password).first()
 
         if not user:
             flash(f"Benutzername oder Passwort falsch!", category='warning')
@@ -59,20 +58,19 @@ def register_page():
             flash(f"Password is not valid", category="danger")
             return render_template("register.jinja")
 
-        query_stmt = f"SELECT * FROM chatusers WHERE username = '{username}'"
-        result = db.session.execute(text(query_stmt))
-        item = result.fetchone()
+        user = Chatuser.query.filter_by(username=username).first()
 
-        if item is not None:
+        if user is not None:
             flash("Username exists, try again", category="danger")
             return render_template("register.jinja")
         
         default_status = "Lorem ipsum dolor sit."
-        default_avatar = "img/default.jpeg"
-        query_insert = f"insert into chatusers (username, password, status) values ('{username}', '{password1}', '{default_status}')"
 
-        db.session.execute(text(query_insert))
+        # Neuen Benutzer erstellen
+        new_user = Chatuser(username=username, password=password1, status=default_status)
+        db.session.add(new_user)
         db.session.commit()
+
         flash("You are registered", category="success")
         return redirect(url_for('chat_page'))
     return render_template("register.jinja")
@@ -97,18 +95,17 @@ def chat_page():
             len(message) == 0):
             flash(f"Message was empty! {message}", category='info')
             return redirect(url_for('chat_page', chat=chat_id))
-        query_send_message = f"INSERT INTO messages (from_user, to_user, message) VALUES ({session['userid']}, '{chat_id}', '{message}')"
-        db.session.execute(text(query_send_message))
+
+        new_message = Message(from_user=session['userid'], to_user=chat_id, message=message)
+        db.session.add(new_message)
         db.session.commit()
 
-    result = db.session.execute(text(f"SELECT * FROM chatusers WHERE id != {session['userid']};"))
-    chats = result.fetchall()
-
-    result = db.session.execute(text(f"SELECT * FROM messages WHERE (to_user = {chat_id} and from_user = {session['userid']}) OR (from_user = {chat_id} and to_user = {session['userid']});"))
-    messages = result.fetchall()
-
-    result = db.session.execute(text(f"SELECT * FROM chatusers WHERE id = {session['userid']}"))
-    current_user = result.fetchone()
+    chats = Chatuser.query.filter(Chatuser.id != session['userid']).all()
+    messages = Message.query.filter(
+        ((Message.to_user == chat_id) & (Message.from_user == session['userid'])) | 
+        ((Message.from_user == chat_id) & (Message.to_user == session['userid']))
+    ).all()
+    current_user = Chatuser.query.get(session['userid'])
 
     return render_template("chat.jinja", messages=messages, chats=chats, current_user=current_user, chat_id=chat_id)
 
@@ -119,54 +116,38 @@ def profile_page():
         username = request.form.get('username')
         status = request.form.get('status')
 
-        if (username is None or
-                isinstance(username, str) is False or
-                len(username) < 3):
-            flash(f"Username is not valid!", category='warning')
+        if not username or len(username) < 3:
+            flash("Username is not valid!", category='warning')
             return render_template('login.jinja')
 
-        if (status is None or
-                isinstance(status, str) is False or
-                len(status) < 3):
-            flash(f"Status is not valid!", category='warning')
+        if not status or len(status) < 3:
+            flash("Status is not valid!", category='warning')
             return render_template('login.jinja')
 
-        result = db.session.execute(text(f"SELECT * FROM chatusers WHERE id = {session['userid']}"))
-        current_user = result.fetchone()
+        current_user = Chatuser.query.get(session['userid'])
 
         if 'file' in request.files:
-            app.logger.info(f"updating profile picture to {username}")
             file = request.files['file']
             if file.filename != '':
                 file_path = os.path.join(app.config["UPLOAD_PATH"], str(current_user.id))
                 file.save(file_path)
-
-                query_update = f"UPDATE chatusers SET avatar = '/avatars/{current_user.id}' WHERE id = '{current_user.id}'"
-                db.session.execute(text(query_update))
+                current_user.avatar = f'/avatars/{current_user.id}'
                 db.session.commit()
-                flash("Avatar succesfully updated!", category="success")
+                flash("Avatar successfully updated!", category="success")
 
         if username != current_user.username:
-            # update username in database
-            app.logger.info(f"updating username to {username}")
-            query_update = f"UPDATE chatusers SET username = '{username}' WHERE id = '{current_user.id}'"
-            db.session.execute(text(query_update))
+            current_user.username = username
             db.session.commit()
-            flash("Username succesfully updated!", category="success")
+            flash("Username successfully updated!", category="success")
 
         if status != current_user.status:
-            # update status in database
-            app.logger.info(f"updating status to {status}")
-            query_update = f"UPDATE chatusers SET status = '{status}' WHERE id = '{current_user.id}'"
-            db.session.execute(text(query_update))
+            current_user.status = status
             db.session.commit()
-            flash("Status succesfully updated!", category="success")
+            flash("Status successfully updated!", category="success")
 
-    result = db.session.execute(text(f"SELECT * FROM chatusers WHERE id = {session['userid']}"))
-    current_user = result.fetchone()
-
+    current_user = Chatuser.query.get(session['userid'])
     return render_template("profile.jinja", current_user=current_user)
-    
+
 
 @app.route("/logout")
 def logout():
@@ -188,8 +169,7 @@ def webshell():
         flash("You can't access this page!", "danger")
         return redirect(url_for("chat_page"))
 
-    result = db.session.execute(text(f"SELECT * FROM chatusers WHERE id = {session['userid']}"))
-    current_user = result.fetchone()
+    current_user = Chatuser.query.get(session['userid'])
 
     result = None
     if request.method == 'POST':
