@@ -3,66 +3,44 @@ from chat.models import Chatuser, Message
 from flask import render_template, request, flash, redirect, url_for, session, send_file, escape
 from werkzeug.utils import secure_filename
 from sqlalchemy import text
+from chat.forms import LoginForm, RegisterForm
 import os
 import subprocess
 
 @app.route('/login', methods=['GET', 'POST'])
 def login_page():
-    if request.method == 'POST':
-        username = str(escape(request.form.get('username')))
-        password = request.form.get('password')
+    form = LoginForm()
 
-        if (username is None or
-                isinstance(username, str) is False or
-                len(username) < 3):
-            flash(f"Username is not valid", category='warning')
-            return render_template('login.jinja')
-
-        if (password is None or
-                isinstance(password, str) is False or
-                len(password) < 3):
-            flash(f"Password is not valid", category='warning')
-            return render_template('login.jinja')
+    if form.validate_on_submit():
+        username = str(escape(form.name.data))
+        password = form.password.data
         
         user = Chatuser.query.filter_by(username=username, password=password).first()
 
         if not user:
             flash(f"Benutzername oder Passwort falsch!", category='warning')
-            return render_template ('login.jinja')
+            return render_template ('login.jinja', form=form)
         
         session['userid'] = user.id
 
         return redirect(url_for("chat_page"))
 
-    return render_template("login.jinja")
+    return render_template("login.jinja", form=form)
 
 
 @app.route('/register', methods=['GET', 'POST'])
 def register_page():
-    if request.method == 'POST':
-        username = str(escape(request.form.get('username')))
-        password1 = request.form.get('password1')
-        password2 = request.form.get('password2')
-
-        if (username is None or
-                isinstance(username, str) is False or
-                len(username) < 3):
-            flash(f"Username is not valid", category="danger")
-            app.logger.info(f"Failed registration: Username is not valid ({username})")
-            return render_template("register.jinja")
-
-        if (password1 is None or
-                isinstance(password1, str) is False or
-                len(password1) < 3 or
-                password1 != password2):
-            flash(f"Password is not valid", category="danger")
-            return render_template("register.jinja")
+    form = RegisterForm()
+    if form.validate_on_submit():
+        username = str(escape(form.name.data))
+        password1 = form.password.data
+        password2 = form.password2.data
 
         user = Chatuser.query.filter_by(username=username).first()
 
         if user is not None:
             flash("Username exists, try again", category="danger")
-            return render_template("register.jinja")
+            return render_template("register.jinja", form=form)
         
         default_status = "Lorem ipsum dolor sit."
 
@@ -73,7 +51,7 @@ def register_page():
 
         flash("You are registered", category="success")
         return redirect(url_for('chat_page'))
-    return render_template("register.jinja")
+    return render_template("register.jinja", form=form)
 
 
 

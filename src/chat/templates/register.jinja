@@ -3,21 +3,12 @@
 {% block content %}
 <main class="form-register w-100 m-auto mt-5">
     <form method="POST" action="/register">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        {{ form.csrf_token }}
         <h1 class="h3 mb-3 fw-normal">Registrieren</h1>
 
-        <div class="form-floating">
-            <input type="text" class="form-control" id="username" name="username" placeholder="Benutzername">
-            <label for="floatingInput">Benutzername</label>
-        </div>
-        <div class="form-floating mb-3">
-            <input type="password" class="form-control" id="password1" name="password1" placeholder="Password">
-            <label for="floatingPassword">Passwort</label>
-        </div>
-        <div class="form-floating mb-3">
-            <input type="password" class="form-control" id="password2" name="password2" placeholder="Password">
-            <label for="floatingPassword">Passwort Bestätigen</label>
-        </div>
+        {{ form.name }}
+        {{ form.password }}
+        {{ form.password2 }}
 
         <button class="btn btn-primary w-100 py-2" type="submit">Registrieren</button>
 
